@@ -1,0 +1,39 @@
+# Build artifacts
+build/
+*.o
+*.d
+*.a
+
+# Compiled binaries
+recovery-tool/sdrecov
+recovery-tool/test_huffman
+corruption-sim/corrsim
+
+# Benchmark output and generated scenarios
+benchmark_results/
+test-data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs and disk images
+*.log
+*.img
+*.img.bak
+recovered/
+output/
+
+# Editor / OS junk
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Local notes (not for publication)
+docs/
+notes/
+TODO.md
