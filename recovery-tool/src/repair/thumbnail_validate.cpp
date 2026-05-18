@@ -70,7 +70,7 @@ float thumbnail_validate(const RecoveryContext &ctx, const Seed &seed,
     if (tcfg.restart_interval > 0)
         thumb_state.mcus_to_restart = tcfg.restart_interval;
 
-    HuffResult thumb_result = huff_validate_cluster(
+    (void)huff_validate_cluster(
         thumb_data + thumb_entropy_off,
         thumb_len - thumb_entropy_off,
         tcfg, thumb_tmpl.dc_tables, thumb_tmpl.ac_tables, thumb_state);
@@ -92,7 +92,7 @@ float thumbnail_validate(const RecoveryContext &ctx, const Seed &seed,
 
     /* Decode just a few MCUs from the main image */
     size_t decode_len = std::min(recovered_len - main_entropy_off, (size_t)8192);
-    HuffResult main_result = huff_validate_cluster(
+    (void)huff_validate_cluster(
         recovered_data + main_entropy_off, decode_len,
         mcfg, main_tmpl.dc_tables, main_tmpl.ac_tables, main_state);
 

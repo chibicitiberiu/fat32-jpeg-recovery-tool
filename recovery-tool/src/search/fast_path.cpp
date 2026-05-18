@@ -50,6 +50,7 @@ FastPathResult try_fast_path(RecoveryContext &ctx, const Seed &seed,
                               uint32_t estimated_min_size,
                               uint32_t estimated_max_size)
 {
+    (void)header_chain;
     FastPathResult result;
     uint32_t bpc = ctx.disk.geo.bytes_per_cluster;
     auto &cfg = tmpl.mcu_config;

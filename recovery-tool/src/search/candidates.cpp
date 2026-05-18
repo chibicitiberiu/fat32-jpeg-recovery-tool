@@ -23,6 +23,7 @@ int enumerate_candidates(uint32_t current, const RecoveryContext &ctx,
                          uint32_t *out_candidates, float *out_priorities,
                          int max_candidates)
 {
+    (void)seed;
     std::vector<Candidate> cands;
     cands.reserve(max_candidates * 2);
 

@@ -6,7 +6,6 @@
 
 static constexpr uint16_t MBR_SIG = 0xAA55;
 
-static uint16_t read16(const uint8_t *p) { return p[0] | (p[1] << 8); }
 static uint32_t read32(const uint8_t *p)
 {
     return uint32_t(p[0]) | (uint32_t(p[1]) << 8)

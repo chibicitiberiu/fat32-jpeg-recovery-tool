@@ -509,11 +509,9 @@ static std::vector<ChainVariant> build_chain_multi(RecoveryContext &ctx, const S
 }
 
 /*
- * Check if a cluster is a gap (zeroed, bad sector, empty).
+ * is_gap_cluster, detect_gaps_by_validation -> repair/gap_detect.cpp
+ * write_recovered, write_recovered_with_rst -> search/file_writer.cpp
  */
-/*
-/* is_gap_cluster, detect_gaps_by_validation -> repair/gap_detect.cpp */
-/* write_recovered, write_recovered_with_rst -> search/file_writer.cpp */
 
 int engine_recover(RecoveryContext &ctx)
 {
@@ -524,7 +522,7 @@ int engine_recover(RecoveryContext &ctx)
     int end = (ctx.seeds_limit > 0) ? std::min(start + ctx.seeds_limit, total) : total;
     int range = end - start;
 
-    log_progress(ctx, "[stage 2/3] Processing seeds %d..%d of %d (%d threads)",
+    log_progress(ctx, "[stage 2/2] Processing seeds %d..%d of %d (%d threads)",
                  start, end - 1, total, ctx.threads);
 
     /* Shared counters */
@@ -541,7 +539,7 @@ int engine_recover(RecoveryContext &ctx)
             /* Progress reporting */
             int done = progress.fetch_add(1);
             if (done % 100 == 0) {
-                log_progress(ctx, "[stage 2/3] %d/%d seeds (%d recovered, %d failed, %d header-fail, %d skipped)",
+                log_progress(ctx, "[stage 2/2] %d/%d seeds (%d recovered, %d failed, %d header-fail, %d skipped)",
                              done, range, recovered.load(), failed.load(),
                              header_fail.load(), skipped.load());
             }
@@ -652,7 +650,7 @@ int engine_recover(RecoveryContext &ctx)
     }
 
     /* Final progress */
-    log_progress(ctx, "[stage 2/3] Done: %d recovered, %d failed, %d header-fail, %d skipped",
+    log_progress(ctx, "[stage 2/2] Done: %d recovered, %d failed, %d header-fail, %d skipped",
                  recovered.load(), failed.load(), header_fail.load(), skipped.load());
     dfs_print_filter_stats(ctx);
     return recovered.load();

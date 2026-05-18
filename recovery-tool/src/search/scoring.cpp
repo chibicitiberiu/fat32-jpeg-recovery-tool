@@ -135,6 +135,7 @@ float evaluate_chain_quality(const RecoveryContext &ctx, const Seed &seed,
                               float avg_score, uint32_t mcus, bool complete,
                               float thumb_confidence)
 {
+    (void)ctx; (void)mcus;
     float eval = avg_score;
 
     if (complete) eval += 0.1f;

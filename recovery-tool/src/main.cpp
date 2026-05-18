@@ -7,7 +7,6 @@
 #include <cstring>
 #include <getopt.h>
 #include <sys/stat.h>
-#include <cerrno>
 
 static void print_usage()
 {
@@ -39,9 +38,6 @@ static void print_usage()
         "  --max-backtracks <N>       Greedy mode: backtracks per seed (default: 5)\n"
         "  -v, --verbose              Increase verbosity\n"
         "  -q, --quiet                Suppress progress\n"
-        "  --dump-cluster-map <file>  Dump cluster map and exit\n"
-        "  --dump-seeds <file>        Dump seed list and exit\n"
-        "  --dump-fat <file>          Dump merged FAT and exit\n"
         "  -h, --help                 This help\n"
         "  --version                  Version info\n"
         "\n"
@@ -61,8 +57,7 @@ static void print_usage()
 
 enum LongOpt {
     OPT_PART_OFFSET = 256, OPT_IMAGE2, OPT_THREADS, OPT_MIN_SCORE,
-    OPT_MAX_CAND, OPT_RADIUS, OPT_BITFLIPS,
-    OPT_DUMP_CMAP, OPT_DUMP_SEEDS, OPT_DUMP_FAT, OPT_VERSION,
+    OPT_MAX_CAND, OPT_RADIUS, OPT_BITFLIPS, OPT_VERSION,
     OPT_SEEDS_OFFSET, OPT_SEEDS_LIMIT, OPT_BEAM_WIDTH, OPT_MAX_BACKTRACKS,
     OPT_SEARCH, OPT_GEO_CLUSTER, OPT_GEO_DATA
 };
@@ -78,9 +73,6 @@ static struct option long_options[] = {
     {"max-candidates",   required_argument, 0, OPT_MAX_CAND},
     {"search-radius",    required_argument, 0, OPT_RADIUS},
     {"bit-flips",        required_argument, 0, OPT_BITFLIPS},
-    {"dump-cluster-map", required_argument, 0, OPT_DUMP_CMAP},
-    {"dump-seeds",       required_argument, 0, OPT_DUMP_SEEDS},
-    {"dump-fat",         required_argument, 0, OPT_DUMP_FAT},
     {"debug-seeds-offset", required_argument, 0, OPT_SEEDS_OFFSET},
     {"debug-seeds-limit",  required_argument, 0, OPT_SEEDS_LIMIT},
     {"beam-width",         required_argument, 0, OPT_BEAM_WIDTH},
@@ -191,7 +183,7 @@ int main(int argc, char **argv)
     log_progress(ctx, "sdrecov %s starting", SDRECOV_VERSION);
 
     /* ---- Stage 1: Load and analyze ---- */
-    log_progress(ctx, "[stage 1/3] Loading disk image...");
+    log_progress(ctx, "[stage 1/2] Loading disk image...");
 
     if (!ctx.disk.primary.open(image_path))
         return 1;
@@ -277,7 +269,7 @@ int main(int argc, char **argv)
     log_progress(ctx, "  FAT confidence: %.1f%%", ctx.fat_confidence * 100);
 
     /* Build cluster map */
-    log_progress(ctx, "[stage 1/3] Classifying %u clusters...", g.total_clusters);
+    log_progress(ctx, "[stage 1/2] Classifying %u clusters...", g.total_clusters);
     cluster_map_build(ctx.disk, ctx.cluster_map);
 
     uint32_t ct[8] = {};
@@ -288,21 +280,18 @@ int main(int argc, char **argv)
                  ct[CTYPE_EMPTY], ct[CTYPE_BAD_SECTOR], ct[CTYPE_UNKNOWN]);
 
     /* Build seeds */
-    log_progress(ctx, "[stage 1/3] Building seed list...");
+    log_progress(ctx, "[stage 1/2] Building seed list...");
     seed_build(ctx);
     log_progress(ctx, "  Seeds: %d", (int)ctx.seeds.size());
 
     /* Build template library from intact headers */
-    log_progress(ctx, "[stage 1/3] Building template library...");
+    log_progress(ctx, "[stage 1/2] Building template library...");
     template_library_build(ctx);
     log_progress(ctx, "  Templates: %d", (int)ctx.templates.size());
 
-    /* ---- Diagnostic dump modes ---- */
-    /* TODO: implement --dump-cluster-map, --dump-seeds, --dump-fat as JSON output */
-
     /* ---- Stage 2: Recover files ---- */
     const char *mode_names[] = {"greedy", "beam", "full"};
-    log_progress(ctx, "[stage 2/3] Starting recovery engine (%d seeds, %d threads, search=%s%s)...",
+    log_progress(ctx, "[stage 2/2] Starting recovery engine (%d seeds, %d threads, search=%s%s)...",
                  (int)ctx.seeds.size(), ctx.threads,
                  mode_names[ctx.search_mode],
                  ctx.search_mode == RecoveryContext::SEARCH_FULL ? " WARNING: very slow!" : "");
@@ -315,9 +304,7 @@ int main(int argc, char **argv)
 
     int recovered = engine_recover(ctx);
 
-    log_progress(ctx, "[stage 2/3] Recovery complete: %d files recovered", recovered);
-
-    /* TODO: Stage 3 (post-processing: compositing, report) */
+    log_progress(ctx, "[stage 2/2] Recovery complete: %d files recovered", recovered);
 
     /* Write JSON report */
     {
