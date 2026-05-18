@@ -415,9 +415,9 @@ int main(int argc, char *argv[])
     if (!image_create(ctx)) return 1;
     if (!fragment_fill(ctx)) return 1;
     if (!file_populate(ctx)) return 1;
-    if (!pre_corruption_apply(ctx)) return 1;
     if (!usage_simulate(ctx)) return 1;
     if (!ground_truth_record(ctx)) return 1;
+    if (!pre_corruption_apply(ctx)) return 1;
     if (!corruption_apply(ctx)) return 1;
     if (!manifest_write(ctx)) return 1;
 
